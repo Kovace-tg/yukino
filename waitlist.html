@@ -17,10 +17,10 @@
         }
         
         .waitlist-form {
-            background-color: var(--card-dark);
+            background-color: var(--card-bg);
             padding: 2rem;
             border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow);
         }
         
         .form-group {
@@ -40,22 +40,38 @@
             padding: 12px;
             border: 2px solid var(--accent);
             border-radius: 8px;
-            background-color: rgba(108, 92, 231, 0.1);
-            color: var(--text-dark);
+            background-color: var(--input-bg);
+            color: var(--text-color);
             font-size: 1rem;
         }
         
         .success-message {
             display: none;
             padding: 2rem;
-            background-color: var(--card-dark);
+            background-color: var(--card-bg);
             border-radius: 10px;
+            box-shadow: var(--shadow);
         }
         
         .success-message p {
             font-size: 1.2rem;
             margin-bottom: 1.5rem;
             color: var(--accent-light);
+        }
+
+        /* Theme variables */
+        :root {
+            --card-bg: #1e1e24;
+            --text-color: #f0f0f0;
+            --input-bg: rgba(108, 92, 231, 0.1);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-mode {
+            --card-bg: #ffffff;
+            --text-color: #2d3436;
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -97,6 +113,30 @@
     </main>
 
     <script>
+        // Theme toggle functionality
+        const toggleBtn = document.querySelector('.theme-toggle');
+        const body = document.body;
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 
+                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        
+        if (savedTheme === 'light') {
+            body.classList.add('light-mode');
+            toggleBtn.textContent = '🌙';
+        } else {
+            toggleBtn.textContent = '☀️';
+        }
+        
+        // Toggle theme
+        toggleBtn.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            const isLight = body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            toggleBtn.textContent = isLight ? '🌙' : '☀️';
+        });
+
+        // Waitlist functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Check if already submitted
             if (localStorage.getItem('waitlistSubmitted')) {
