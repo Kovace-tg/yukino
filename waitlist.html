@@ -3,58 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yukino AI Agent | Waitlist</title>
+    <title>Yukino AI Agent - Waitlist</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Waitlist-specific styles */
-        .waitlist-form {
+        /* Additional styles for waitlist page */
+        .waitlist-container {
             max-width: 500px;
             margin: 2rem auto;
             padding: 2rem;
             text-align: center;
         }
-
-        .waitlist-table {
-            width: 100%;
-            margin-top: 2rem;
-            border-collapse: collapse;
-            background-color: var(--card-bg);
-            color: var(--text-color);
+        
+        .waitlist-form {
+            background-color: var(--card-dark);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
-
-        .waitlist-table th, .waitlist-table td {
-            padding: 12px;
+        
+        .form-group {
+            margin-bottom: 1.5rem;
             text-align: left;
-            border-bottom: 1px solid var(--border-color);
         }
-
-        .waitlist-table th {
-            background-color: var(--accent-transparent);
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
             color: var(--accent-light);
         }
-
+        
         .form-group input {
-            background-color: var(--input-bg);
-            color: var(--text-color);
+            width: 100%;
+            padding: 12px;
             border: 2px solid var(--accent);
+            border-radius: 8px;
+            background-color: rgba(108, 92, 231, 0.1);
+            color: var(--text-dark);
+            font-size: 1rem;
         }
-
-        :root {
-            --card-bg: #1e1e24;
-            --text-color: #f0f0f0;
-            --border-color: #6c5ce733;
-            --accent-transparent: #6c5ce722;
-            --input-bg: rgba(108, 92, 231, 0.1);
+        
+        .success-message {
+            display: none;
+            padding: 2rem;
+            background-color: var(--card-dark);
+            border-radius: 10px;
         }
-
-        body.light-mode {
-            --card-bg: #ffffff;
-            --text-color: #2d3436;
-            --border-color: #e0e0e0;
-            --accent-transparent: #a29bfe22;
-            --input-bg: rgba(255, 255, 255, 0.9);
+        
+        .success-message p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-light);
         }
     </style>
 </head>
@@ -68,114 +69,62 @@
     </header>
 
     <main>
-        <section class="waitlist-form">
+        <div class="waitlist-container">
             <h1>Join the Waitlist</h1>
             
-            <div id="form-container">
+            <div id="form-container" class="waitlist-form">
                 <form id="waitlist-form">
                     <div class="form-group">
-                        <label for="email">Submit Your Email</label>
+                        <label for="email">Your Email Address</label>
                         <input type="email" id="email" name="email" required placeholder="your@email.com">
                     </div>
-                    <button type="submit" class="cta-button" id="submit-btn">
+                    <button type="submit" class="cta-button">
                         <span>Join Waitlist</span>
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </form>
             </div>
-
-            <div id="success-message" style="display: none;">
-                <p class="success-text">Thank you for joining!</p>
+            
+            <div id="success-message" class="success-message">
+                <p>Thank you for joining the waitlist!</p>
+                <p>We've sent your request to yukinoaiagent@gmail.com</p>
                 <button onclick="goToIndex()" class="cta-button">
-                    <span>Back to Home</span>
+                    <span>Back To Home</span>
                     <i class="fas fa-home"></i>
                 </button>
             </div>
-
-<br>
-            <div class="waitlist-section">
-                <h2>Current Waitlist</h2>
-                <table class="waitlist-table" id="waitlist-table">
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>Email</th>
-                            <th>Join Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="waitlist-body">
-                        <!-- Filled by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-            </p>
-        </section>
+        </div>
     </main>
 
-    <script src="script.js"></script>
     <script>
-        // Theme toggle from script.js
-        function initializeTheme() {
-            const savedTheme = localStorage.getItem('theme') || 
-                             (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            
-            if (savedTheme === 'light') {
-                document.body.classList.add('light-mode');
-                document.querySelector('.theme-toggle').textContent = '🌙';
-            }
-        }
-
-        // Waitlist functionality
-        let waitlist = JSON.parse(localStorage.getItem('waitlist')) || [];
-
         document.addEventListener('DOMContentLoaded', function() {
-            initializeTheme();
-            
-            const form = document.getElementById('waitlist-form');
-            const formContainer = document.getElementById('form-container');
-            const successMsg = document.getElementById('success-message');
-            
-            if (localStorage.getItem('userSubmitted')) {
-                formContainer.style.display = 'none';
-                successMsg.style.display = 'block';
+            // Check if already submitted
+            if (localStorage.getItem('waitlistSubmitted')) {
+                showSuccessMessage();
             }
-
-            form.addEventListener('submit', function(e) {
+            
+            // Form submission
+            document.getElementById('waitlist-form').addEventListener('submit', function(e) {
                 e.preventDefault();
-                const email = document.getElementById('email').value.trim();
-                const [prefix, domain] = email.split('@');
                 
-                waitlist.push({
-                    fullEmail: email,
-                    maskedEmail: `${prefix.substring(0,3)}****@${domain}`,
-                    date: new Date().toLocaleDateString()
-                });
-
-                localStorage.setItem('waitlist', JSON.stringify(waitlist));
-                localStorage.setItem('userSubmitted', 'true');
+                const email = document.getElementById('email').value;
                 
-                formContainer.style.display = 'none';
-                successMsg.style.display = 'block';
-                updateWaitlistTable();
+                // Send email via mailto
+                const subject = "Join Waitlist Yukino AI Agent";
+                const mailtoLink = `mailto:yukinoaiagent@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("Email: " + email)}`;
+                window.location.href = mailtoLink;
+                
+                // Mark as submitted
+                localStorage.setItem('waitlistSubmitted', 'true');
+                showSuccessMessage();
             });
-
-            updateWaitlistTable();
         });
-
-        function updateWaitlistTable() {
-            const tbody = document.getElementById('waitlist-body');
-            tbody.innerHTML = '';
-            waitlist.forEach((entry, index) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${entry.maskedEmail}</td>
-                        <td>${entry.date}</td>
-                    </tr>
-                `;
-            });
+        
+        function showSuccessMessage() {
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('success-message').style.display = 'block';
         }
-
+        
         function goToIndex() {
             window.location.href = 'index.html';
         }
