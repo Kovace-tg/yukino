@@ -8,7 +8,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Additional styles for waitlist page */
+        /* Theme Variables */
+        :root {
+            --bg-color: #0f0f12;
+            --text-color: #f0f0f0;
+            --accent: #6c5ce7;
+            --accent-light: #a29bfe;
+            --card-bg: #1e1e24;
+            --input-bg: rgba(108, 92, 231, 0.1);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        body.light-mode {
+            --bg-color: #f8f9fa;
+            --text-color: #2d3436;
+            --card-bg: #ffffff;
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Base Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease;
+        }
+
+        /* Waitlist Specific Styles */
         .waitlist-container {
             max-width: 500px;
             margin: 2rem auto;
@@ -21,6 +48,7 @@
             padding: 2rem;
             border-radius: 10px;
             box-shadow: var(--shadow);
+            transition: all 0.3s ease;
         }
         
         .form-group {
@@ -43,6 +71,7 @@
             background-color: var(--input-bg);
             color: var(--text-color);
             font-size: 1rem;
+            transition: all 0.3s ease;
         }
         
         .success-message {
@@ -52,27 +81,6 @@
             border-radius: 10px;
             box-shadow: var(--shadow);
         }
-        
-        .success-message p {
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
-            color: var(--accent-light);
-        }
-
-        /* Theme variables */
-        :root {
-            --card-bg: #1e1e24;
-            --text-color: #f0f0f0;
-            --input-bg: rgba(108, 92, 231, 0.1);
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        body.light-mode {
-            --card-bg: #ffffff;
-            --text-color: #2d3436;
-            --input-bg: rgba(255, 255, 255, 0.9);
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
     </style>
 </head>
 <body>
@@ -81,7 +89,7 @@
             <img src="yai.png" alt="Logo" class="logo">
             <span class="project-name">YUKINO AI</span>
         </div>
-        <button class="theme-toggle">☀️</button>
+        <button class="theme-toggle" id="themeToggle">☀️</button>
     </header>
 
     <main>
@@ -89,7 +97,7 @@
             <h1>Join the Waitlist</h1>
             
             <div id="form-container" class="waitlist-form">
-                <form id="waitlist-form">
+                <form id="waitlistForm">
                     <div class="form-group">
                         <label for="email">Your Email Address</label>
                         <input type="email" id="email" name="email" required placeholder="your@email.com">
@@ -103,8 +111,7 @@
             
             <div id="success-message" class="success-message">
                 <p>Thank you for joining the waitlist!</p>
-                <p>We've sent your request to yukinoaiagent@gmail.com</p>
-                <button onclick="goToIndex()" class="cta-button">
+                <button onclick="window.location.href='index.html'" class="cta-button">
                     <span>Back To Home</span>
                     <i class="fas fa-home"></i>
                 </button>
@@ -113,61 +120,55 @@
     </main>
 
     <script>
-        // Theme toggle functionality
-        const toggleBtn = document.querySelector('.theme-toggle');
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
         
-        // Check for saved theme preference
-        const savedTheme = localStorage.getItem('theme') || 
-                         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        
-        if (savedTheme === 'light') {
-            body.classList.add('light-mode');
-            toggleBtn.textContent = '🌙';
-        } else {
-            toggleBtn.textContent = '☀️';
+        // Initialize theme
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 
+                             (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            
+            if (savedTheme === 'light') {
+                body.classList.add('light-mode');
+                themeToggle.textContent = '🌙';
+            } else {
+                themeToggle.textContent = '☀️';
+            }
         }
         
         // Toggle theme
-        toggleBtn.addEventListener('click', () => {
+        themeToggle.addEventListener('click', () => {
             body.classList.toggle('light-mode');
             const isLight = body.classList.contains('light-mode');
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            toggleBtn.textContent = isLight ? '🌙' : '☀️';
-        });
-
-        // Waitlist functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if already submitted
-            if (localStorage.getItem('waitlistSubmitted')) {
-                showSuccessMessage();
-            }
-            
-            // Form submission
-            document.getElementById('waitlist-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const email = document.getElementById('email').value;
-                
-                // Send email via mailto
-                const subject = "Join Waitlist Yukino AI Agent";
-                const mailtoLink = `mailto:yukinoaiagent@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent("Email: " + email)}`;
-                window.location.href = mailtoLink;
-                
-                // Mark as submitted
-                localStorage.setItem('waitlistSubmitted', 'true');
-                showSuccessMessage();
-            });
+            themeToggle.textContent = isLight ? '🌙' : '☀️';
         });
         
-        function showSuccessMessage() {
+        // Waitlist Form Handling
+        document.getElementById('waitlistForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            
+            // Send email via mailto
+            const subject = "Join Waitlist Yukino AI Agent";
+            const body = `Email: ${email}`;
+            window.location.href = `mailto:yukinoaiagent@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Show success message
+            document.getElementById('form-container').style.display = 'none';
+            document.getElementById('success-message').style.display = 'block';
+            localStorage.setItem('waitlistSubmitted', 'true');
+        });
+        
+        // Check if already submitted
+        if (localStorage.getItem('waitlistSubmitted')) {
             document.getElementById('form-container').style.display = 'none';
             document.getElementById('success-message').style.display = 'block';
         }
         
-        function goToIndex() {
-            window.location.href = 'index.html';
-        }
+        // Initialize on load
+        initTheme();
     </script>
 </body>
 </html>
